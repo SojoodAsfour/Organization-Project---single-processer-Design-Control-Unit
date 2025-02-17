@@ -1,0 +1,259 @@
+Control signal: 
+
+RegDst(2bits)
+00 >> Rd
+01 >> R7
+10 >> R1
+11 >> xxx
+..........
+RegWrite(1bit)
+0 >> no write to memory
+1 >> write to memory
+..........
+ExtOp(1bit)
+0 >> zero extend (Imm5)
+1 >> sign extend (Imm5)
+..........
+in2Sel(2bit)
+00 >> Buss2
+01 >> extend (Imm5)
+10 >> (Imm3,Imm2)
+11 >> Imm11
+..........
+MemW(1 bit)
+0 >> no write
+1 >> write
+..........
+MemR(1 bit)
+0 >> no read
+1 >> read
+..........
+WData(2 bits)
+00 >> ALU result
+01 >> Data memory
+10 >> PC + 1
+11 >> xxxxxxxxxxxxxxxx
+...........
+BROP(3 bits)
+000 >> BEQ
+001 >> BNE
+010 >> BLT
+011 >> BGE
+100 >> BLTU
+101 >> BGEU
+110 >> X
+111 >> X
+...........
+PCcs(2 bits)
+00 >> PC = PC+1
+01 >> PC=PC+sign_extend({imm2U, imm3L})
+10 >> PC=PC+sign_extend(imm11)
+11 >> PC=rs1+sign_extend(imm5)
+...........
+ALU Control Unit
+
+f=0,Op=0 0000000 -> 0x00 ,ShiftImmReg= 00, ALUop = 0000 -> 0x00 (XOR)
+----------------------------------------------------------
+f=1,Op=0 0100000 -> 0x20 ,ShiftImmReg = 00, ALUop = 0001 -> 0X01 (OR)
+----------------------------------------------------------
+f=2,Op=0 1000000 -> 0x40 ,ShiftImmReg = 00, ALUop = 0010 -> 0x02 (AND)
+----------------------------------------------------------
+f=0,Op=1 0000001 -> 0x01 ,ShiftImmReg = 00, ALUop = 0111 -> 0x07 (SLL)
+----------------------------------------------------------
+f=1,Op=1 0100001 -> 0x21 ,ShiftImmReg = 00, ALUop = 1000 -> 0x08 (SRL)
+----------------------------------------------------------
+f=2,Op=1 1000001 -> 0x41 ,ShiftImmReg = 00, ALUop = 1001 -> 0x09 (SRA)
+----------------------------------------------------------
+f=0,Op=2 0000010 -> 0x02 ,ShiftImmReg = 00, ALUop = 0011 -> 0x03 (ADD)
+----------------------------------------------------------
+f=1,Op=2 0100010 -> 0x22 ,ShiftImmReg = 00, ALUop = 0100 -> 0x04(SUB)
+----------------------------------------------------------
+f=2,Op=2 1000010 -> 0x42 ,ShiftImmReg = 00, ALUop = 0101 -> 0x05(SLT)
+----------------------------------------------------------
+f=3,Op=2 1100010 -> 0x62 ,ShiftImmReg = 00, ALUop = 0110 -> 0x06 (SLTU)
+----------------------------------------------------------
+f=xx, op=3, (ADDI)
+f=00,Op=3 0000011 -> 0x03 ,ShiftImmReg = 00 , ALUop = 0011 -> 0x03 
+f=01,Op=3 0100011 -> 0x23 ,ShiftImmReg = 00, ALUop = 0011 -> 0x03 
+f=10,Op=3 1000011 -> 0x43 ,ShiftImmReg = 00, ALUop = 0011 -> 0x03
+f=11,Op=3 1100011 -> 0x63 ,ShiftImmReg = 00, ALUop = 0011 -> 0x03 
+----------------------------------------------------------
+f=xx, op=4, (SLTI)
+f=00,Op=4 0000100 -> 0x04 ,ShiftImmReg = 00, ALUop = 0101 -> 0x05 
+f=01,Op=4 0100100 -> 0x24 ,ShiftImmReg = 00, ALUop = 0101 -> 0x05 
+f=10,Op=4 1000100 -> 0x44 ,ShiftImmReg = 00, ALUop = 0101 -> 0x05 
+f=11,Op=4 1100100 -> 0x64 ,ShiftImmReg = 00, ALUop = 0101 -> 0x05 
+----------------------------------------------------------
+f=xx, op=5, (SLTIU)
+f=00,Op=5 0000101 -> 0x05 ,ShiftImmReg = 00, ALUop = 0110 -> 0x06 
+f=01,Op=5 0100101 -> 0x25 ,ShiftImmReg = 00, ALUop = 0110 -> 0x06 
+f=10,Op=5 1000101 -> 0x45 ,ShiftImmReg = 00, ALUop = 0110 -> 0x06 
+f=11,Op=5 1100101 -> 0x65 ,ShiftImmReg = 00, ALUop = 0110 -> 0x06 
+----------------------------------------------------------
+f=xx, op=6, (XORI)
+f=00,Op=6 0000110 -> 0x06 ,ShiftImmReg = 00, ALUop = 0000 -> 0x00 
+f=01,Op=6 0100110 -> 0x26 ,ShiftImmReg = 00, ALUop = 0000 -> 0x00 
+f=10,Op=6 1000110 -> 0x46 ,ShiftImmReg = 00, ALUop = 0000 -> 0x00
+f=11,Op=6 1100110 -> 0x66 ,ShiftImmReg = 00, ALUop = 0000 -> 0x00  
+----------------------------------------------------------
+f=xx, op=7, (ORI)
+f=00,Op=7 0000111 -> 0x07, ShiftImmReg = 00, ALUop = 0001 -> 0x01
+f=01,Op=7 0100111 -> 0x27 ,ShiftImmReg = 00, ALUop = 0001 -> 0x01 
+f=10,Op=7 1000111 -> 0x47 ,ShiftImmReg = 00, ALUop = 0001 -> 0x01
+f=11,Op=7 1100111 -> 0x67 ,ShiftImmReg = 00, ALUop = 0001 -> 0x01
+----------------------------------------------------------
+f=xx, op=8, (ANDI)
+f=00,Op=8 0001000 -> 0x08 ,ShiftImmReg = 00, ALUop = 0010 -> 0x02 
+f=01,Op=8 0101000 -> 0x28 ,ShiftImmReg = 00, ALUop = 0010 -> 0x02 
+f=10,Op=8 1001000 -> 0x48 ,ShiftImmReg = 00, ALUop = 0010 -> 0x02
+f=11,Op=8 1101000 -> 0x68 ,ShiftImmReg = 00, ALUop = 0010 -> 0x02 
+----------------------------------------------------------
+f=xx, op=9, (SLLI) 010001
+f=00,Op=9 0001001 -> 0x09 ,ShiftImmReg = 00, ALUop = 0111 -> 0x07 (Imm4)
+f=01,Op=9 0101001 -> 0x29 ,ShiftImmReg = 00, ALUop = 0111 -> 0x07 (Imm3)
+f=10,Op=9 1001001 -> 0x49 ,ShiftImmReg = 00, ALUop = 0111 -> 0x07 (Imm2)
+f=11,Op=9 1101001 -> 0x69 ,ShiftImmReg = 00, ALUop = 0111 -> 0x07 (Imm1)
+----------------------------------------------------------
+f=xx, op=10, (SRLI)
+f=00,Op=10 0001010 -> 0x0A ,ShiftImmReg = 00, ALUop = 1000 -> 0x08 (Imm4)
+f=01,Op=10 0101010 -> 0x2A ,ShiftImmReg = 00, ALUop = 1000 -> 0x08 (Imm3)
+f=10,Op=10 1001010 -> 0x4A ,ShiftImmReg = 00, ALUop = 1000 -> 0x08 (Imm2)
+f=11,Op=10 1101010 -> 0x6A ,ShiftImmReg = 00, ALUop = 1000 -> 0x08 (Imm1)
+----------------------------------------------------------
+f=xx, op=11, (SRAI)
+f=00,Op=11 0001011 -> 0x0B ,ShiftImmReg = 00, ALUop = 1001 -> 0x09 (Imm4)
+f=01,Op=11 0101011 -> 0x2B ,ShiftImmReg = 00, ALUop = 1001 -> 0x09 (Imm3)
+f=10,Op=11 1001011 -> 0x4B ,ShiftImmReg = 00, ALUop = 1001 -> 0x09 (Imm2)
+f=11,Op=11 1101011 -> 0x6B ,ShiftImmReg = 00, ALUop = 1001 -> 0x09 (Imm1)
+----------------------------------------------------------
+f=xx, op=12, (LW)
+f=00,Op=12 0001100 -> 0x0C ,ShiftImmReg = 00, ALUop = 0011 -> 0x03
+f=01,Op=12 0101100 -> 0x2C ,ShiftImmReg = 00, ALUop = 0011 -> 0x03
+f=10,Op=12 1001100 -> 0x4C ,ShiftImmReg = 00, ALUop = 0011 -> 0x03
+f=11,Op=12 1101100 -> 0x6C ,ShiftImmReg = 00, ALUop = 0011 -> 0x03
+----------------------------------------------------------
+f=xx, op=13, (SW)
+f=00,Op=13 0001101 -> 0x0D ,ShiftImmReg = 00, ALUop = 0011 -> 0x03
+f=01,Op=13 0101101 -> 0x2D ,ShiftImmReg = 00, ALUop = 0011 -> 0x03
+f=10,Op=13 1001101 -> 0x4D ,ShiftImmReg = 00, ALUop = 0011 -> 0x03
+f=11,Op=13 1101101 -> 0x6D ,ShiftImmReg = 00, ALUop = 0011 -> 0x03
+----------------------------------------------------------
+f=xx, op=14, (BEQ)
+f=00,Op=14 0001110 -> 0x0E ,ShiftImmReg = 00, ALUop = 0100 -> 0x04
+f=01,Op=14 0101110 -> 0x2E ,ShiftImmReg = 00, ALUop = 0100 -> 0x04
+f=10,Op=14 1001110 -> 0x4E ,ShiftImmReg = 00, ALUop = 0100 -> 0x04
+f=11,Op=14 1101110 -> 0x6E ,ShiftImmReg = 00, ALUop = 0100 -> 0x04
+----------------------------------------------------------
+f=xx, op=15, (BNE)
+f=00,Op=15 0001111 -> 0x0F ,ShiftImmReg = 00, ALUop = 0100 -> 0x04
+f=01,Op=15 0101111 -> 0x2F ,ShiftImmReg = 00, ALUop = 0100 -> 0x04
+f=10,Op=15 1001111 -> 0x4F ,ShiftImmReg = 00, ALUop = 0100 -> 0x04
+f=11,Op=15 1101111 -> 0x6F ,ShiftImmReg = 00, ALUop = 0100 -> 0x04
+----------------------------------------------------------
+f=xx, op=16, (BLT)
+f=00,Op=16 0010000 -> 0x10 ,ShiftImmReg = 00, ALUop = 0101 -> 0x05
+f=01,Op=16 0110000 -> 0x30 ,ShiftImmReg = 00, ALUop = 0101 -> 0x05
+f=10,Op=16 1010000 -> 0x50 ,ShiftImmReg = 00, ALUop = 0101 -> 0x05
+f=11,Op=16 1110000 -> 0x70 ,ShiftImmReg = 00, ALUop = 0101 -> 0x05
+----------------------------------------------------------
+f=xx, op=17, (BGE)
+f=00,Op=17 0010001 -> 0x11 ,ShiftImmReg = 00,ALUop = 0101 -> 0x05
+f=01,Op=17 0110001 -> 0x31 ,ShiftImmReg = 00,ALUop = 0101 -> 0x05
+f=10,Op=17 1010001 -> 0x51 ,ShiftImmReg = 00,ALUop = 0101 -> 0x05
+f=11,Op=17 1110001 -> 0x71 ,ShiftImmReg = 00,ALUop = 0101 -> 0x05
+----------------------------------------------------------
+f=xx, op=18, (BLTU)
+f=00,Op=18 0010010 -> 0x12 ,ShiftImmReg = 00,ALUop = 0110 -> 0x06
+f=01,Op=18 0110010 -> 0x32 ,ShiftImmReg = 00,ALUop = 0110 -> 0x06
+f=10,Op=18 1010010 -> 0x52 ,ShiftImmReg = 00,ALUop = 0110 -> 0x06
+f=11,Op=18 1110010 -> 0x72 ,ShiftImmReg = 00,ALUop = 0110 -> 0x06
+----------------------------------------------------------
+f=xx, op=19, (BGEU)
+f=00,Op=19 0010011 -> 0x13 ,ShiftImmReg = 00, ALUop = 0110 -> 0x06
+f=01,Op=19 0110011 -> 0x33 ,ShiftImmReg = 00, ALUop = 0110 -> 0x06
+f=10,Op=19 1010011 -> 0x53 ,ShiftImmReg = 00, ALUop = 0110 -> 0x06
+f=11,Op=19 1110011 -> 0x73 ,ShiftImmReg = 00, ALUop = 0110 -> 0x06
+----------------------------------------------------------
+f=xx, op=20, (LUI)
+f=00,Op=20 0010100 -> 0x14 ,ShiftImmReg = 00, ALUop = 1010 -> 0x0A
+f=01,Op=20 0110100 -> 0x34 ,ShiftImmReg = 00, ALUop = 1010 -> 0x0A
+f=10,Op=20 1010100 -> 0x54 ,ShiftImmReg = 00, ALUop = 1010 -> 0x0A
+f=11,Op=20 1110100 -> 0x74 ,ShiftImmReg = 00, ALUop = 1010 -> 0x0A
+-----------------------------------------------------------
+PC selection op 5bit, (BROP-3bit , PCcs 2bits)
+
+op = 00000 = 0x00 ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 00001 = 0x01 ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 00010 = 0x02 ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 00011 = 0x03 ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 00100 = 0x04 ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 00101 = 0x05 ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 00110 = 0x06 ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 00111 = 0x07 ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 01000 = 0x08 ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 01001 = 0x09 ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 01010 = 0x0A ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 01011 = 0x0B ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 01100 = 0x0C ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 01101 = 0x0D ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 01110 = 0x0E ---> (BROP-3bit , PCcs 2bits) 00001 = 0x 01
+op = 01111 = 0x0F ---> (BROP-3bit , PCcs 2bits) 00101 = 0x 05
+op = 10000 = 0x10 ---> (BROP-3bit , PCcs 2bits) 01001 = 0x 09
+op = 10001 = 0x11 ---> (BROP-3bit , PCcs 2bits) 01101 = 0x 0D
+op = 10010 = 0x12 ---> (BROP-3bit , PCcs 2bits) 10001 = 0x 11
+op = 10011 = 0x13 ---> (BROP-3bit , PCcs 2bits) 10101 = 0x 15
+op = 10100 = 0x14 ---> (BROP-3bit , PCcs 2bits) 00000 = 0x 00
+op = 10101 = 0x15 ---> (BROP-3bit , PCcs 2bits) 00010 = 0x 02
+op = 10110 = 0x16 ---> (BROP-3bit , PCcs 2bits) 00010 = 0x 02
+op = 10111 = 0x17 ---> (BROP-3bit , PCcs 2bits) 00011 = 0x 03
+-------------------------------------------------------------------------
+op 5bits, RegDst 2bits, RegWrite 1bit, ExtOp 1bit, in2Sel 2bits, MemW 1bit, MemR 1bit, WData 2bits
+ 
+op = 00000 = 0x00 -> 00_1_1_00_0_0_00 -> 0x0C0
+op = 00001 = 0x01 -> 00_1_1_00_0_0_00 -> 0x0C0
+op = 00010 = 0x02 -> 00_1_1_00_0_0_00 -> 0x0C0
+op = 00011 = 0x03 -> 00_1_1_01_0_0_00 -> 0x0D0
+op = 00100 = 0x04 -> 00_1_1_01_0_0_00 -> 0x0D0
+op = 00101 = 0x05 -> 00_1_1_01_0_0_00 -> 0x0D0
+op = 00110 = 0x06 -> 00_1_1_01_0_0_00 -> 0x0D0
+op = 00111 = 0x07 -> 00_1_1_01_0_0_00 -> 0x0D0
+op = 01000 = 0x08 -> 00_1_1_01_0_0_00 -> 0x0D0
+op = 01001 = 0x09 -> 00_1_1_01_0_0_00 -> 0x0D0
+op = 01010 = 0x0A -> 00_1_1_01_0_0_00 -> 0x0D0
+op = 01011 = 0x0B -> 00_1_1_01_0_0_00 -> 0x0D0
+op = 01100 = 0x0C -> 00_1_0_01_0_1_01 -> 0x095
+op = 01101 = 0x0D -> 00_0_0_10_1_0_01 -> 0x029
+op = 01110 = 0x0E -> 00_0_0_10_0_0_01 -> 0x021
+op = 01111 = 0x0F -> 00_0_0_10_0_0_01 -> 0x021
+op = 10000 = 0x10 -> 00_0_0_10_0_0_01 -> 0x021
+op = 10001 = 0x11 -> 00_0_0_10_0_0_01 -> 0x021
+op = 10010 = 0x12 -> 00_0_0_10_0_0_01 -> 0x021
+op = 10011 = 0x13 -> 00_0_0_10_0_0_01 -> 0x021
+op = 10100 = 0x14 -> 00_1_0_11_0_0_00 -> 0x2B0
+op = 10101 = 0x15 -> 00_0_0_00_0_0_00 -> 0x000
+op = 10110 = 0x16 -> 01_1_0_00_0_0_10 -> 0x182
+op = 10111 = 0x17 -> 00_1_0_00_0_0_10 -> 0x082
+------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+ 
+  
+
+
+
+ 
+
+
+
